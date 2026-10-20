@@ -26,26 +26,7 @@ function canZone(z){return z===0||stars(z-1,3)>0}
 function canStage(z,s){return canZone(z)&&(s===0||stars(z,s-1)>0)}
 function starText(n){return '<span class="g-stars">'+'★'.repeat(n)+'<span class="dim">'+'☆'.repeat(3-n)+'</span></span>'}
 function totalStars(){return Object.values(game().stars).reduce((n,v)=>n+Number(v||0),0)}
-function mascot(){return '<svg viewBox="0 0 270 270" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="黑柴財財安全勇者">'+
- '<defs><linearGradient id="fur" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#38312e"/><stop offset=".65" stop-color="#161b20"/><stop offset="1" stop-color="#42382d"/></linearGradient><linearGradient id="helm" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#ffec8c"/><stop offset="1" stop-color="#ed9a2b"/></linearGradient></defs>'+
- '<path d="M78 79 Q45 3 34 19 Q21 81 52 118 M185 77 Q235 0 241 21 Q244 89 219 118" fill="url(#fur)" stroke="#1d1919" stroke-width="7"/>'+
- '<path d="M72 86 Q48 24 45 34 L62 92 M205 85 Q228 24 231 35 L215 96" fill="#ad8871"/>'+
- '<ellipse cx="135" cy="229" rx="95" ry="76" fill="url(#fur)" stroke="#1a1b18" stroke-width="5"/>'+
- '<path d="M68 233 Q133 205 202 233 L187 270 H83Z" fill="#e8d4b5"/>'+
- '<path d="M61 202 Q86 221 94 269 M207 200 Q185 229 183 269" stroke="#ba792d" stroke-width="13" fill="none"/>'+
- '<ellipse cx="136" cy="136" rx="104" ry="100" fill="url(#fur)" stroke="#211a19" stroke-width="5"/>'+
- '<path d="M50 160 Q52 111 88 105 Q102 126 112 150 Q149 159 159 150 Q173 123 192 105 Q215 122 219 163 Q192 221 135 225 Q70 223 50 160" fill="#e4d4be"/>'+
- '<ellipse cx="96" cy="133" rx="17" ry="15" fill="#29231f"/><ellipse cx="173" cy="133" rx="17" ry="15" fill="#29231f"/>'+
- '<ellipse cx="100" cy="128" rx="5" ry="6" fill="#fff"/><ellipse cx="176" cy="128" rx="5" ry="6" fill="#fff"/>'+
- '<path d="M85 101q14 -11 28 -3M160 98q14 -8 28 5" stroke="#c38f5c" stroke-width="12" stroke-linecap="round"/>'+
- '<ellipse cx="134" cy="171" rx="22" ry="15" fill="#21201c"/><ellipse cx="134" cy="165" rx="9" ry="4" fill="#797875"/>'+
- '<path d="M111 189Q134 216 157 190" fill="#2d1d1a" stroke="#32201b" stroke-width="5" stroke-linecap="round"/><path d="M130 193Q123 219 139 224Q158 213 143 194" fill="#e87985"/>'+
- '<path d="M65 80Q69 23 139 26Q208 25 211 81L208 92Q139 80 66 92Z" fill="url(#helm)" stroke="#87531c" stroke-width="5"/>'+
- '<path d="M62 93Q134 69 216 93L207 108Q139 94 67 110Z" fill="#ffc45e" stroke="#8f5822" stroke-width="4"/>'+
- '<path d="M125 56q11 8 18 0m-18 0q-5 -12 -10 0t11 14q13 2 19 -8m-21-6q9-11 0-14" stroke="#8b5b25" stroke-width="5" fill="none" stroke-linecap="round"/>'+
- '<path d="M61 226L46 258L75 267L85 234 M211 226L227 259L197 266L184 234" fill="#302c29" stroke="#b98446" stroke-width="5"/>'+
- '<rect x="156" y="220" width="45" height="31" rx="6" fill="#d49b43" stroke="#674a28" stroke-width="5"/><path d="M172 230h13m-6-7v16" stroke="#fff6c7" stroke-width="4"/>'+
- '</svg>'}
+function mascot(){return '<img class="g-photo" src="./shiba-photo.svg?v=2" alt="黑柴財財安全勇者">'}
 function mascotImg(){return '<span aria-label="黑柴財財" class="g-shiba-mark">'+mascot()+'</span>'}
 function header(){const g=game(), exp=g.xp%180,pc=Math.round(exp/180*100);return '<div class="g-status"><span class="g-avatar">'+mascot()+'</span><div class="g-status-text"><strong>🐾 財財勇者　Lv.'+level()+'</strong><small>甲級闖關學習系統　'+($api().course()==="22100"?"職業衛生":$api().course()==="22000"?"職業安全":"職安衛")+'</small><div class="g-exp"><i style="width:'+pc+'%"></i></div></div><div class="g-coins">🪙 <b>'+g.coins+'</b><small>金幣</small></div><div class="g-coins">⭐ <b>'+totalStars()+'</b><small>星星</small></div></div>'}
 function navTitle(title,back,description){return '<div class="g-title"><button data-game="'+back+'">← 返回</button><span>'+h(title)+'</span><span style="font-size:11px">🐾</span></div>'+(description?'<p class="g-note pale">'+h(description)+'</p>':'')}
@@ -91,7 +72,7 @@ return '<main class="game-page">'+navTitle((b.zone+1)+'-'+(b.stage+1)+'　'+st.n
  '<div class="g-battle-scene"><span class="g-hero-fighter">🐕‍🦺</span><span class="g-boss-fighter '+(st.boss?'boss':'')+'">'+(st.boss?zone.boss:zone.foe)+'</span></div>'+
  '<div class="g-question"><div class="g-row"><span class="g-capsule">'+(q.source_type==="official"?"官方公告題庫（第三方整理）":"原創／自訂練習題")+'</span><span class="g-tiny">'+(q.type==="multi"?"複選題":"單選題")+'</span></div>'+
  '<h2>'+h(q.text)+'</h2>'+choices+
- (b.checked?'<div class="g-feedback '+(b.lastCorrect?'ok':'bad')+'"><strong>'+(b.lastCorrect?'✅ 攻擊成功！答對了！':'💔 遭受攻擊！繼續學習！')+'</strong><div>正確答案：'+q.answer.map(i=>letters[i]).join('、')+'</div><div>'+h(q.explanation||"請搭配法規原文核對本題。")+'</div>'+(q.source_url?'<a href="'+h(q.source_url)+'" target="_blank" rel="noopener noreferrer">查看題目來源／官方題庫 ↗</a>':'')+'</div>'+
+ (b.checked?'<div class="g-feedback '+(b.lastCorrect?'ok':'bad')+'"><strong>'+(b.lastCorrect?'✅ 攻擊成功！答對了！':'💔 遭受攻擊！繼續學習！')+'</strong><div>正確答案：'+q.answer.map(i=>letters[i]).join('、')+'</div><div>'+h(q.explanation||"請搭配法規原文核對本題。")+'</div>'+((q.source_url&&/^https:\/\//i.test(q.source_url))?'<a href="'+h(q.source_url)+'" target="_blank" rel="noopener noreferrer">查看題目來源／官方題庫 ↗</a>':'')+'</div>'+
  '<button class="g-btn full" data-game="next">'+(final?'🏆 查看闖關結果':'🐾 下一題 ➜')+'</button>':
  '<button class="g-btn full" data-game="check" '+(!b.picked.length?'disabled':'')+'>⚔️ 確認攻擊</button>')+'</div>'+
  '<p class="g-note" style="text-align:center">魔王 HP 由題目進度代表；完整選出複選題全部答案才算答對。</p></main>'}
