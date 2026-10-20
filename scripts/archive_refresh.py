@@ -39,7 +39,7 @@ def cert_of(value: str) -> str | None:
 
 def roc_year(value: str) -> int | None:
     # A historical ROC year must be recognizable within a row or link title.
-    for m in re.finditer(r"(?<!\d)(9\d|10\d|11\d)(?:年|[-_－ /]|第)", value):
+    for m in re.finditer(r"(?<!\d)(9\d|10\d|11\d)(?!\d)", value):
         y = int(m.group(1)) + 1911
         if 2010 <= y <= THIS_YEAR:
             return y
