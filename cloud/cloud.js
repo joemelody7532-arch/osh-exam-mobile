@@ -287,8 +287,8 @@ async function migrateLocalLearner(){
   if(!confirm('要將「'+record.name+'」的本機練習成果匯入目前登入的雲端帳號 '+user.email+' 嗎？此操作不可重複，請確認是本人資料。'))return;
   const merged=mergeState(old,localData(user.id),{});
   // Reserve before any upload so retrying never double-counts XP/coins.
-  localStorage.setItem(importedKey,user.id);
   saveLocal(user.id,merged);
+  localStorage.setItem(importedKey,user.id);
   pending=true;
   showStatus('⏳ 已加入本機資料，正在上傳雲端');
   const ok=await syncNow();
