@@ -1,0 +1,43 @@
+name: Cloud auth and admin code checks
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'cloud/**'
+      - 'admin.html'
+      - 'index.html'
+      - 'supabase/**'
+      - '.github/workflows/cloud-checks.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  cloud-syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check browser JavaScript syntax
+        run: |
+          node --check cloud/cloud.js
+          node --check cloud/admin.js
+          node --check cloud/cloud-config.js
+          node --check local-accounts.js
+          node --check adventure.js
+      - name: Check no cloud secrets embedded in repo
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          config=Path('cloud/cloud-config.js').read_text()
+          assert 'publishableKey: ""' in config, 'Cloud key is expected to be configured only after project creation and RLS verification'
+          assert 'url: ""' in config, 'Cloud project URL must be deliberately configured after database setup'
+          sql=Path('supabase/migrations/20261020_osh_cloud.sql').read_text()
+          assert 'enable row level security' in sql.lower()
+          assert "role = 'admin'" in sql
+          for p in ['cloud/cloud.js','cloud/admin.js']:
+            body=Path(p).read_text()
+            assert 'service_role' not in body and 'sb_secret_' not in body
+          print('PASS: RLS migration and no secret keys in public JS')
+          PY
