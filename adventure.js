@@ -97,7 +97,7 @@ return '<main class="game-page">'+navTitle((b.zone+1)+'-'+(b.stage+1)+'　'+st.n
  '<div class="g-battle-scene"><span class="g-hero-fighter"><img src="./shiba-photo.svg?v=2" alt="黑柴財財迎戰"></span><span class="g-boss-fighter '+(st.boss?'boss':'')+'">'+(st.boss?zone.boss:zone.foe)+'</span></div>'+
  '<div class="g-question"><div class="g-row"><span class="g-capsule">'+(q.source_type==="official"?"官方公告題庫（第三方整理）":"原創／自訂練習題")+'</span><span class="g-tiny">'+(q.type==="multi"?"複選題":"單選題")+'</span></div>'+
  '<h2>'+h(q.text)+'</h2>'+choices+
- (b.checked?'<div class="g-feedback '+(b.lastCorrect?'ok':'bad')+'"><strong>'+(b.lastCorrect?'✅ 攻擊成功！答對了！':'💔 遭受攻擊！繼續學習！')+'</strong><div>正確答案：'+q.answer.map(i=>letters[i]).join('、')+'</div><div>'+h(q.explanation||"請搭配法規原文核對本題。")+'</div>'+((q.source_url&&/^https:\/\//i.test(q.source_url))?'<a href="'+h(q.source_url)+'" target="_blank" rel="noopener noreferrer">查看題目來源／官方題庫 ↗</a>':'')+'</div>'+
+ (b.checked?'<div class="g-feedback '+(b.lastCorrect?'ok':'bad')+'"><strong>'+(b.lastCorrect?'✅ 攻擊成功！答對了！':'💔 遭受攻擊！繼續學習！')+'</strong><div>正確答案：'+q.answer.map(i=>letters[i]).join('、')+'</div><div>'+h(q.explanation||"請搭配法規原文核對本題。")+'</div>'+($api().legalAnalysis?'<details class="g-legal-details"><summary>📖 完整解題理由與逐選項詳解</summary>'+$api().legalAnalysis(q)+'</details>':'')+((q.source_url&&/^https:\/\//i.test(q.source_url))?'<a href="'+h(q.source_url)+'" target="_blank" rel="noopener noreferrer">查看題目來源／官方題庫 ↗</a>':'')+'</div>'+
  '<button class="g-btn full" data-game="next">'+(final?'🏆 查看闖關結果':'🐾 下一題 ➜')+'</button>':
  '<button class="g-btn full" data-game="check" '+(!b.picked.length?'disabled':'')+'>⚔️ 確認攻擊</button>')+'</div>'+
  '<p class="g-note" style="text-align:center">魔王 HP 由題目進度代表；完整選出複選題全部答案才算答對。</p></main>'}
