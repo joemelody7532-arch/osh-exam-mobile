@@ -34,6 +34,7 @@ function home(){const g=game(),today=$api().today(),records=$api().saved().attem
 return '<main class="game-page">'+header()+
  '<section class="g-hero"><div class="g-cloud"></div><div class="g-logo"><h1>職安勇者</h1><span>甲級闖關學習系統</span></div><div class="g-intro">跟著黑柴財財<br>把考古題變成<br>一場安全冒險！</div><div class="g-mascot">'+mascot()+'</div><div class="g-speech">🐾 答題蒐集星星，打敗危害魔王！</div></section>'+
  '<button class="g-btn full" data-game="world">🐾 開始冒險　➜</button>'+
+ (getBattle()?'<button class="g-btn blue full" data-game="resume">▶ 繼續上次的關卡</button>':'')+
  '<section class="g-board"><h2>🏆 勇者任務板</h2><div class="g-statgrid"><div><b>'+daily+'/10</b><small>今日答題</small></div><div><b>'+totalStars()+'/72</b><small>冒險星星</small></div><div><b>'+g.clears+'</b><small>成功闖關</small></div></div><p>🎁 每日任務：完成 10 題，即完成今日學習目標！</p><div class="g-progress"><span style="width:'+Math.min(100,daily*10)+'%"></span></div></section>'+
  '<section class="g-board"><h2>🎒 選擇勇者證照</h2>'+$api().selector()+'<p>題目沿用現有題庫，官方參考題與原創練習題會明確標示。</p></section>'+
  '<section class="g-board"><h2>🗺️ 冒險與備考</h2><div class="g-quickgrid">'+
@@ -69,7 +70,7 @@ const st=STAGES[b.stage],zone=ZONES[b.zone],final=b.index===b.ids.length-1||b.hp
 const choices=q.options.map((x,i)=>{const sel=b.picked.includes(i),correct=q.answer.includes(i);let klass=b.checked?(correct?"correct":sel?"wrong":""):sel?"active":"";return '<button class="g-choice '+klass+'" data-game="pick" data-pick="'+i+'" '+(b.checked?'disabled':'')+'><b>'+(q.type==="multi"?(sel?'☑':'□'):letters[i])+'</b><span>'+h(x)+'</span>'+(b.checked&&correct?' ✅':'')+'</button>'}).join('');
 return '<main class="game-page">'+navTitle((b.zone+1)+'-'+(b.stage+1)+'　'+st.name,'quit')+
  '<div class="g-battle-head"><span>🐾 財財　<span class="g-hp">'+('❤️'.repeat(b.hp)+'🤍'.repeat(3-b.hp))+'</span></span><span>第 '+(b.index+1)+' / '+b.ids.length+' 題</span></div><div class="g-progress"><span style="width:'+(b.index/b.ids.length*100)+'%"></span></div>'+
- '<div class="g-battle-scene"><span class="g-hero-fighter">🐕‍🦺</span><span class="g-boss-fighter '+(st.boss?'boss':'')+'">'+(st.boss?zone.boss:zone.foe)+'</span></div>'+
+ '<div class="g-battle-scene"><span class="g-hero-fighter"><img src="./shiba-photo.svg?v=2" alt="黑柴財財迎戰"></span><span class="g-boss-fighter '+(st.boss?'boss':'')+'">'+(st.boss?zone.boss:zone.foe)+'</span></div>'+
  '<div class="g-question"><div class="g-row"><span class="g-capsule">'+(q.source_type==="official"?"官方公告題庫（第三方整理）":"原創／自訂練習題")+'</span><span class="g-tiny">'+(q.type==="multi"?"複選題":"單選題")+'</span></div>'+
  '<h2>'+h(q.text)+'</h2>'+choices+
  (b.checked?'<div class="g-feedback '+(b.lastCorrect?'ok':'bad')+'"><strong>'+(b.lastCorrect?'✅ 攻擊成功！答對了！':'💔 遭受攻擊！繼續學習！')+'</strong><div>正確答案：'+q.answer.map(i=>letters[i]).join('、')+'</div><div>'+h(q.explanation||"請搭配法規原文核對本題。")+'</div>'+((q.source_url&&/^https:\/\//i.test(q.source_url))?'<a href="'+h(q.source_url)+'" target="_blank" rel="noopener noreferrer">查看題目來源／官方題庫 ↗</a>':'')+'</div>'+
