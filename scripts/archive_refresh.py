@@ -76,6 +76,8 @@ def scan_oshbon(soup: BeautifulSoup, base: str) -> list[dict]:
         h = table.find_previous(["h1", "h2", "h3", "h4", "h5", "strong"])
         nearby = h.get_text(" ", strip=True) if h else ""
         cert = cert_of(nearby)
+        sample = table.find("tr")
+        print(f"OSHBon section: heading={nearby[:65]!r}, cert={cert}, row_count={len(table.find_all('tr'))}, first_row={(sample.get_text(' ',strip=True)[:170] if sample else 'none')!r}")
         for tr in table.find_all("tr"):
             cells = tr.find_all(["td", "th"], recursive=False)
             if len(cells) < 2:
