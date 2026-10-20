@@ -26,6 +26,10 @@ jobs:
           node --check cloud/cloud-config.js
           node --check local-accounts.js
           node --check adventure.js
+      - name: Test simulated first phone to second phone cloud sync
+        run: |
+          npm install --no-save --no-audit --no-fund jsdom@26
+          node tests/cloud-auth-smoke.cjs
       - name: Check no cloud secrets embedded in repo
         run: |
           python3 - <<'PY'
