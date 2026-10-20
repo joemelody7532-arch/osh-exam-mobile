@@ -71,3 +71,22 @@ html{background:#122d39}body{background:#172e3f}
 .g-capsule{display:inline-block;border-radius:30px;background:#386e54;color:#fff;font-size:10px;font-weight:800;padding:4px 10px}
 .g-tiny{font-size:11px;color:#987d5c}.g-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
 @media(max-width:360px){.g-logo h1{font-size:29px}.g-mascot{width:54%}.g-node{width:121px}.g-node strong{font-size:10px}}
+
+/* Photographic black-Shiba hero from user's reference, scaling and learning details */
+.g-hero .g-mascot{right:-7px;width:56%;height:70%}
+.g-mascot img.g-photo{width:100%;height:100%;object-fit:contain;object-position:bottom center;filter:drop-shadow(0 8px 9px #342c1b65)}
+.g-hero-fighter{width:100px;height:146px;font-size:inherit;display:flex;align-items:flex-end}
+.g-hero-fighter img{height:100%;max-width:100%;object-fit:contain;object-position:bottom;filter:drop-shadow(0 4px 4px #2d311c77)}
+.g-win .big-shiba{height:165px;width:160px;display:grid;place-items:center;margin:0 auto}
+.g-win .big-shiba img{height:100%;width:100%;object-fit:contain;filter:drop-shadow(0 5px 4px #63402166)}
+.g-legal-details{margin-top:12px;background:#fffdf3;border:1px solid #d9ba7f;border-radius:12px;padding:10px}
+.g-legal-details summary{font-weight:900;cursor:pointer;color:#6b462c;list-style:revert;padding:5px}
+.g-legal-details .legal-analysis{margin-top:10px;font-size:12px}
+.g-legal-details .reason-choice{background:#fff;overflow-wrap:anywhere}
+.g-legal-details a{overflow-wrap:anywhere}
+.g-hero .g-logo{max-width:95%}
+.g-hero .g-logo h1{font-size:clamp(25px,7.7vw,35px)}
+.g-hero .g-intro{max-width:56%;padding-top:52px}
+.g-status .g-photo{max-height:55px}
+.g-win .g-photo{border-radius:10px}
+.g-title button:focus-visible,.g-btn:focus-visible,.g-stage:focus-visible,.g-node:focus-visible,.g-choice:focus-visible{outline:3px solid #268dcf;outline-offset:3px}
