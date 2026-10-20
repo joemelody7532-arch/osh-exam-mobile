@@ -255,6 +255,49 @@ async function signOut(){
  try{await client.auth.signOut()}catch{}
  mode='login';promptMessage='已登出。';touch();
 }
+
+/* One-time migration of an existing local PIN-protected learner, only with
+   that learner's PIN. Never automatically import another learner's data. */
+function localProfiles(){
+ try{
+  const db=JSON.parse(localStorage.getItem('OSH_LOCAL_ACCOUNTS_v1')||'null');
+  return Array.isArray(db?.profiles)?db.profiles.filter(p=>p?.id&&p?.name&&p?.salt&&p?.digest):[];
+ }catch{return []}
+}
+async function localPinValid(pin,p){
+ if(!/^[0-9]{6,12}$/.test(pin))return false;
+ const saltBytes=new Uint8Array((p.salt.match(/.{2}/g)||[]).map(h=>parseInt(h,16)));
+ const key=await crypto.subtle.importKey('raw',new TextEncoder().encode(pin),'PBKDF2',false,['deriveBits']);
+ const digest=await crypto.subtle.deriveBits({name:'PBKDF2',salt:saltBytes,iterations:140000,hash:'SHA-256'},key,256);
+ return Array.from(new Uint8Array(digest),b=>b.toString(16).padStart(2,'0')).join('')===p.digest;
+}
+async function migrateLocalLearner(){
+ const el=$('osh-import-local'),pin=$('osh-import-pin');
+ if(!ready||!user||!el||!pin)return;
+ const profileId=el.value,record=localProfiles().find(x=>x.id===profileId);
+ if(!record)return alert('找不到所選的舊版本機檔案。');
+ const importedKey='OSH_Cloud_Migrated_Local_v1_'+record.id;
+ if(localStorage.getItem(importedKey))return alert('此本機檔案已經安排轉入雲端，為避免重複計算成績，不可再次匯入。');
+ try{
+  if(!await localPinValid(pin.value,record))throw Error('舊版 PIN 不正確。');
+  const raw=localStorage.getItem('OSH_Exam_PWA_v1_user_'+record.id);
+  if(!raw)throw Error('原手機找不到此帳號的答題進度。');
+  const old=JSON.parse(raw);
+  if(!old||typeof old!=='object')throw Error('原始備份格式有誤。');
+  if(!confirm('要將「'+record.name+'」的本機練習成果匯入目前登入的雲端帳號 '+user.email+' 嗎？此操作不可重複，請確認是本人資料。'))return;
+  const merged=mergeState(old,localData(user.id),{});
+  // Reserve before any upload so retrying never double-counts XP/coins.
+  localStorage.setItem(importedKey,user.id);
+  saveLocal(user.id,merged);
+  pending=true;
+  showStatus('⏳ 已加入本機資料，正在上傳雲端');
+  const ok=await syncNow();
+  pin.value='';
+  touch();
+  alert(ok?'已完成舊版資料匯入與雲端同步。':'已加入本機待同步紀錄。網路恢復時會自動上傳，請不要再次匯入。');
+ }catch(e){pin.value='';alert('匯入失敗：'+String(e?.message||e))}
+}
+
 function settingsPanel(){
  if(!ready)return '';
  return '<div class="osh-settings-account"><strong>☁️ 雲端同步：<span id="osh-cloud-sync">'+esc(lastNotice||'準備中')+'</span></strong>'+
@@ -262,11 +305,13 @@ function settingsPanel(){
  '<br>學習進度可在不同手機使用同一電子郵件帳號同步。</p>'+
  '<button class="osh-signout" type="button" data-cloud-action="sync">現在同步</button>　'+
  (profile?.role==='admin'?'<a href="./admin.html" class="osh-signout">管理者儀表板</a>':'')+
- '</div>';
+ '</div>'+
+ (localProfiles().length?'<div class="osh-settings-account"><strong>📦 舊版本機學員進度轉入雲端</strong><p>只能匯入同一支手機內的舊帳號。須輸入該學員原本的 PIN，不會自動讀取其他人的進度；每個本機檔案只可轉移一次。</p><label for="osh-import-local">舊版學員</label><select id="osh-import-local">'+localProfiles().map(p=>'<option value="'+esc(p.id)+'">'+esc(p.name)+'</option>').join('')+'</select><label for="osh-import-pin">舊版 PIN 碼</label><input id="osh-import-pin" type="password" inputmode="numeric" minlength="6" maxlength="12"><button class="osh-signout" type="button" data-cloud-action="migrate">驗證並轉移舊進度</button></div>':'');
 }
 document.addEventListener('click',e=>{
  const el=e.target.closest('[data-cloud-action]');
  if(el?.dataset.cloudAction==='sync')syncNow();
+ if(el?.dataset.cloudAction==='migrate')migrateLocalLearner();
 });
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')pull()});
 window.addEventListener('online',()=>{if(pending)syncNow();else pull()});
