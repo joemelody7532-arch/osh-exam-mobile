@@ -1,0 +1,44 @@
+name: 每日法規修正日期檢查
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '15 10 * * *'
+      timezone: Asia/Taipei
+  push:
+    paths:
+      - '.github/workflows/law-watch.yml'
+      - 'scripts/law_watch.py'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: law-watch-main
+  cancel-in-progress: false
+
+jobs:
+  inspect-official-laws:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout site source
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Prepare Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compare official revised dates
+        run: python scripts/law_watch.py
+      - name: Publish law-status only if updated
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/law-status.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Update official law revision check status"
+            git push
+          else
+            echo "No status change"
+          fi
