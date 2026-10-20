@@ -223,3 +223,36 @@ html{background:#122d39}body{background:#172e3f}
  .g-chapter-dog{right:6%}
 }
 @media(prefers-reduced-motion:reduce){.g-hero .g-mascot,.g-map-cameo{animation:none}}
+
+
+/* v4: restore reference screenshot's warm parchment + original realistic Chaichai,
+   preserving the original game functionality and page structure. */
+.game-page .g-status{
+ color:#553323!important;
+ background:linear-gradient(110deg,#fff8e2 0%,#f7e5be 70%,#ffefcb 100%)!important;
+ border:3px solid #986233;
+ box-shadow:inset 0 0 0 2px #fffaeb,0 5px 0 #5c3a27,0 12px 19px #263a2d45;
+}
+.g-status-text strong{font-size:clamp(13px,3.9vw,17px);color:#512e1e;line-height:1.22}
+.g-status-text small{color:#785942!important;font-weight:750}
+.g-status .g-exp{background:linear-gradient(#83634b,#ad8463);border:1px solid #bc9367;height:10px}
+.g-status .g-exp i{background:linear-gradient(90deg,#fbd871,#eaa127)}
+.g-status .g-coins{color:#6b4529;font-size:11px}
+.g-status .g-coins b{font-size:17px;color:#542f22}
+.g-status .g-avatar{border:3px solid #d49a3f;background:radial-gradient(circle,#fff5d1,#b88a51);width:56px;height:56px}
+.g-status .g-avatar .g-photo{object-fit:cover;object-position:center 31%;width:126%;height:126%;margin:4px 0 0 -9%;mask-image:none;-webkit-mask-image:none}
+.g-hero .g-mascot{width:59%;height:73%;bottom:0;right:-5%;filter:drop-shadow(0 8px 9px #1c312e66)}
+.g-hero .g-mascot img.g-photo{mask-image:none;-webkit-mask-image:none;object-fit:contain;filter:drop-shadow(0 8px 7px #1d322767)}
+.g-chapter-dog .g-photo,.g-bag-mascot .g-photo,.g-win .big-shiba img,.g-hero-fighter img,.g-map-cameo .g-photo{mask-image:none;-webkit-mask-image:none;object-fit:contain}
+.g-hero .g-intro{color:#354524;font-weight:950;text-shadow:0 2px 2px #fff9d1}
+.g-hero .g-logo{border-color:#e8be78;background:linear-gradient(155deg,#98653a,#5a351f 55%,#402817)}
+.g-hero .g-logo h1{color:#ffe59a;text-shadow:2px 3px #7d371f,0 0 3px #fff8d0}
+.g-chapter-banner,.g-bag-banner,.g-battle-scene{
+ background-color:#b9dda1;
+}
+.g-btn:focus-visible,[data-game]:focus-visible{outline:3px solid #2568b0;outline-offset:4px}
+@media(max-width:370px){
+  .g-status{gap:7px;padding:7px}
+  .g-status .g-avatar{width:48px;height:48px}
+  .g-hero .g-mascot{width:63%;right:-8%}
+}
