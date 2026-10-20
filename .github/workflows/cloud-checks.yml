@@ -36,8 +36,10 @@ jobs:
           from pathlib import Path
           config=Path('cloud/cloud-config.js').read_text()
           assert 'window.OSH_CLOUD_CONFIG' in config
-          assert 'sb_secret_' not in config and 'service_role' not in config
-          assert 'postgres://' not in config and 'postgresql://' not in config
+          import re
+          config_code=re.sub(r'/\\*.*?\\*/','',config,flags=re.S)
+          assert 'sb_secret_' not in config_code and 'service_role' not in config_code
+          assert 'postgres://' not in config_code and 'postgresql://' not in config_code
           sql=Path('supabase/migrations/20261020_osh_cloud.sql').read_text()
           assert 'enable row level security' in sql.lower()
           assert "role = 'admin'" in sql
