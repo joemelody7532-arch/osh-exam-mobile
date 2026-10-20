@@ -1,0 +1,24 @@
+{
+  "checked_at": "",
+  "checked_scope": "已核對基準資料，尚待 GitHub Actions 首次實際線上檢查",
+  "laws": {
+    "N0060022": {
+      "amended": "2026-06-26",
+      "source": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=N0060022"
+    },
+    "N0060027": {
+      "amended": "2026-06-29",
+      "source": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=N0060027"
+    },
+    "N0060001": {
+      "amended": "2025-12-19",
+      "source": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=N0060001"
+    },
+    "N0060040": {
+      "amended": "2022-08-12",
+      "source": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=N0060040"
+    }
+  },
+  "changes": [],
+  "errors": []
+}
