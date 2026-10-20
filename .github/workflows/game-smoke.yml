@@ -1,0 +1,31 @@
+name: Shiba RPG gameplay smoke test
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'adventure.js'
+      - 'adventure.css'
+      - 'tests/adventure-smoke.cjs'
+      - '.github/workflows/game-smoke.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  test-mobile-adventure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Check JavaScript syntax
+        run: node --check adventure.js && node --check tests/adventure-smoke.cjs
+      - name: Install DOM test runtime
+        run: npm install --no-save --no-audit --no-fund jsdom@26
+      - name: Simulate stage completion and verify original exam features
+        run: node tests/adventure-smoke.cjs
