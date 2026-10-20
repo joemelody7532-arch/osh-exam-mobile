@@ -1,0 +1,45 @@
+name: 黑柴職安勇者遊戲驗收
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'index.html'
+      - 'adventure.js'
+      - 'adventure.css'
+      - 'shiba-photo.svg'
+      - 'tests/shiba-smoke.mjs'
+      - '.github/workflows/shiba-smoke.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  test-shiba-adventure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check JavaScript syntax
+        run: |
+          node --check adventure.js
+          python3 - <<'PY'
+          from pathlib import Path
+          text=Path('index.html').read_text(encoding='utf-8')
+          start=text.find('<script>')+len('<script>')
+          end=text.find('</script>',start)
+          assert start>=len('<script>') and end>start
+          Path('/tmp/index-inline.js').write_text(text[start:end],encoding='utf-8')
+          PY
+          node --check /tmp/index-inline.js
+      - name: Install browser for mobile smoke test
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Play iPhone-size RPG smoke test
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/site.log 2>&1 &
+          node tests/shiba-smoke.mjs
