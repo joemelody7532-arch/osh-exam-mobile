@@ -9,7 +9,7 @@ if(!/^https:\/\/[a-z0-9-]+\.supabase\.co\/?$/.test(cfg.url||'')||
 const KEY_PREFIX='OSH_Exam_PWA_v1_cloud_';
 const BASE_PREFIX='OSH_Cloud_Baseline_v1_';
 let client=null,user=null,profile=null,ready=false,connecting=true;
-let base={},version=0,debounce=null,sending=false,pending=false,lastNotice='',isRefreshing=false;
+let base={},version=0,rowExists=false,debounce=null,sending=false,pending=false,lastNotice='',isRefreshing=false;
 let mode='login',promptMessage='',authBusy=false;
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[x]));
@@ -122,7 +122,7 @@ async function submitAuth(e){
  e.preventDefault();if(authBusy||connecting||!client)return;
  authBusy=true;promptMessage='處理中…';renderAuth();
  // Values were replaced by re-render; use values from submitter's original form instead.
- const data=new FormData(e.target),email=(data.get('email')||'').toString().trim();
+ // Deprecated helper kept as no-op; active handler is authSubmit.
  authBusy=false;
 }
 // Overrides submitAuth with direct capture before painting.
@@ -171,7 +171,7 @@ async function adopt(next){
   const locallyModified=localStorage.getItem(acctKey(next.id))&& !equal(local,older);
   const nextState=locallyModified?mergeState(local,cloudState,older):cloudState;
   saveLocal(next.id,nextState);
-  base=clone(cloudState);version=cloudVersion;
+  base=clone(cloudState);version=cloudVersion;rowExists=!!result.data;
   localStorage.setItem(baseKey(next.id),JSON.stringify({data:base,version}));
   user=next;profile=info.data;ready=true;connecting=false;showStatus(locallyModified?'有尚待上傳的學習資料':'雲端進度已同步');
   touch();
@@ -190,10 +190,10 @@ async function syncNow(){
  if(!pending && equal(snapshot,base))return true;
  sending=true;showStatus('⏳ 正在同步');
  try{
-  let candidate=clone(snapshot),baseForMerge=clone(base),targetVersion=version;
+  let candidate=clone(snapshot),baseForMerge=clone(base),targetVersion=version,targetExists=rowExists;
   for(let retry=0;retry<4;retry++){
    let savedRow=null;
-   if(targetVersion===0){
+   if(!targetExists){
     // INSERT when no row exists; conflicting first writes are merged on retry.
     const r=await client.from('learner_progress').insert({user_id:userId,data:candidate,stats:extractStats(candidate)}).select('version').maybeSingle();
     if(!r.error)savedRow=r.data;
@@ -206,7 +206,7 @@ async function syncNow(){
    }
    if(savedRow){
     if(user?.id!==userId)return false;
-    version=Number(savedRow.version);base=clone(candidate);
+    version=Number(savedRow.version);rowExists=true;base=clone(candidate);
     localStorage.setItem(baseKey(userId),JSON.stringify({data:base,version}));
     const newer=localData(userId);
     if(equal(newer,snapshot)){saveLocal(userId,candidate);pending=false;}
@@ -217,7 +217,7 @@ async function syncNow(){
    const r=await client.from('learner_progress').select('data,version').eq('user_id',userId).maybeSingle();
    if(r.error)throw r.error;
    candidate=mergeState(candidate,r.data?.data||{},baseForMerge);
-   targetVersion=Number(r.data?.version||0);
+   targetVersion=Number(r.data?.version||0);targetExists=!!r.data;
    baseForMerge=clone(r.data?.data||{});
   }
   throw Error('多裝置同時更新，請稍後重試');
