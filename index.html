@@ -160,7 +160,7 @@ const LEGAL_EXPLAIN={
   }
 };
 let lawWatch=null;
-function lawArticleURL(pcode,article){return pcode==='LABOR'?'https://law.moj.gov.tw/LawClass/LawSingle.aspx?pcode=N0030001&flno='+article:'https://law.moj.gov.tw/LawClass/LawSingle.aspx?pcode='+encodeURIComponent(pcode)+'&flno='+article}
+function lawArticleURL(pcode,article){if(pcode==='URL'||pcode==='DETAIL')return article;return pcode==='LABOR'?'https://law.moj.gov.tw/LawClass/LawSingle.aspx?pcode=N0030001&flno='+article:'https://law.moj.gov.tw/LawClass/LawSingle.aspx?pcode='+encodeURIComponent(pcode)+'&flno='+article}
 function lawItemFor(q){const v=String(q.id||'');return Object.keys(LEGAL_EXPLAIN).map(k=>v.endsWith(k)?LEGAL_EXPLAIN[k]:null).find(Boolean)||null}
 function lawCategory(q){return /健康檢查|體格檢查|健康管理|健檢/.test(q.text)?'N0060022':/委員會|管理辦法|管理系統/.test(q.text)?'N0060027':/雇主|承攬|安全衛生/.test(q.text)?'N0060001':null}
 
@@ -168,31 +168,18 @@ let detailedReasons={};
 let detailedReasonsLoaded=false;
 async function loadDetailedReasons(){
  try{
-  const response=await fetch('./data/answer-explanations.json?v=1.2',{cache:'no-store'});
+  const response=await fetch('./data/answer-explanations.json?v=1.4',{cache:'no-store'});
   if(!response.ok)throw Error('HTTP '+response.status);
   const data=await response.json();
   if(data&&data.items&&typeof data.items==='object'){
     detailedReasons=data.items;
     detailedReasonsLoaded=true;
     if(page==='quiz'&&inSession&&!inSession.mock)renderPreserve();
+    else if(['home','practice','settings'].includes(page))renderPreserve();
   }
  }catch(e){console.warn('詳解載入失敗：保留原本的題庫與法規提示',e)}
 }
 
-let priorityReasons={};
-let priorityReady=false;
-async function loadPriorityExplanations(){
- try{
-  const response=await fetch('./data/priority-explanations.json?v=1.4.0',{cache:'no-store'});
-  if(!response.ok)throw Error('HTTP '+response.status);
-  const data=await response.json();
-  if(!data||typeof data.items!=='object')throw Error('題庫格式錯誤');
-  priorityReasons=data.items;
-  priorityReady=true;
-  if(page==='quiz'&&inSession&&!inSession.mock)renderPreserve();
-  else if(page==='home'||page==='practice'||page==='settings')renderPreserve();
- }catch(e){console.warn('甲級專業詳解載入失敗，保留原有解說：',e)}
-}
 function topicCategory(q){
  const known=reasonItemFor(q);
  if(known?.category)return known.category;
@@ -219,7 +206,7 @@ function coverageCard(){
  return '<section class="card coverage-card"><div class="row"><strong>📚 甲級職安｜專業詳解完成度</strong><span class="coverage-pill">V1.4</span></div>'+
  (info.total?'<div class="coverage-big">'+info.checked+' / '+info.total+' 題 <small>('+pct+'%)</small></div>':'<div class="coverage-big">載入公開題庫後顯示完成度</div>')+
  '<div class="progress-track"><div class="progress-bar" style="width:'+pct+'%"></div></div>'+
- '<p class="coverage-sub">此處只計入「已逐題撰寫解題理由」的官方專業題，不把一般題庫答案或制式提示計為完成。</p>'+
+ '<p class="coverage-sub">已逐項撰寫解題理由的公告專業題；這不等於每題法條均已完成法務審核。其餘題目仍可一般練習。</p>'+
  info.cats.map(c=>'<div class="coverage-row"><span>'+c.name+'</span><strong>'+c.checked+' / '+(c.total||'—')+'</strong></div>').join('')+
  '<p class="coverage-sub">題庫未收錄或尚待修法核對者不計為完成；最終以最新生效法規為準。</p></section>';
 }
@@ -233,9 +220,9 @@ function focusPracticeCard(){
 function reasonItemFor(q){
  const id=String(q.id||'');
  const exactCode=id.startsWith('G-')?id.split('-').slice(2).join('-'):id;
- if(priorityReasons[exactCode])return priorityReasons[exactCode];
  const fromExisting=lawItemFor(q);
  if(fromExisting)return fromExisting;
+ if(detailedReasons[exactCode])return detailedReasons[exactCode];
  const exact=detailedReasons[id];
  if(exact)return exact;
  const match=Object.keys(detailedReasons).find(k=>id.endsWith('-'+k));
@@ -345,7 +332,6 @@ render();
 updateCloud(true);
 loadLawReport();
 loadDetailedReasons();
-loadPriorityExplanations();
 // Single-file edition: no service worker asset needed.
 })();
 </script></body></html>
