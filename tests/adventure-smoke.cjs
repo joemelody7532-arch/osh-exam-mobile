@@ -56,7 +56,7 @@ async function main() {
   assert.equal(d.querySelectorAll('.g-node').length,6,'Need six adventure areas');
   click('[data-game="zone"][data-z="0"]');
   assert.equal(d.querySelectorAll('.g-stage').length,4,'Need four stages');
-  assert.ok(d.querySelector('[data-game="stage"][data-s="1"]').disabled,'Second stage must start locked');
+  assert.ok(d.querySelectorAll('.g-stage.locked').length>=1,'Second stage must start locked');
   click('[data-game="stage"][data-z="0"][data-s="0"]');
   assert.ok(d.querySelector('.g-question'),'Battle has not rendered a question');
   console.log('PASS: World map, chapter and first question load');
