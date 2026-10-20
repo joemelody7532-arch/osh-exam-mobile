@@ -30,3 +30,13 @@ linear-gradient(170deg,#1b536c 0,#459b9a 31%,#b8d39a 65%,#efe5c2 100%);font-fami
 .osh-signout{border:2px solid #b48851;border-radius:11px;padding:9px 16px;background:#fff8e6;color:#7d4329;font-weight:850}
 .g-status .osh-userchip{margin-left:4px;max-width:78px;padding:5px 6px;background:#fff8df}
 @media(max-width:395px){.topbar .small-date{display:none}.osh-userchip{max-width:103px}.osh-account-page{padding:24px 14px}}
+
+/* The same original parchment UI is reused when Supabase cloud auth is enabled. */
+.osh-auth-message{background:#fff4d8;border:1px solid #e1bc7b;border-radius:11px;padding:10px 12px;font-size:12px;line-height:1.6;color:#7d4c21}
+.osh-settings-account select,.osh-settings-account input[type=password]{
+ display:block;width:100%;max-width:450px;margin:7px 0 12px;
+ border:2px solid #d2b183;background:#fffdf6;color:#432f24;
+ border-radius:10px;padding:9px 12px;font:inherit;font-size:15px;
+}
+.osh-settings-account label{display:block;font-size:12px;font-weight:850;margin:7px 0 4px;color:#6c4c32}
+.osh-settings-account .osh-signout{display:inline-block;margin-top:4px;margin-right:4px;text-decoration:none;font-size:12px}
