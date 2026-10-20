@@ -48,7 +48,7 @@ async function main() {
   d.querySelector('#osh-new-confirm').value='123456';
   d.querySelector('#osh-signup').dispatchEvent(new window.Event('submit',{bubbles:true,cancelable:true}));
   for(let i=0;i<90&&!d.querySelector('.g-hero');i++)await new Promise(resolve=>setTimeout(resolve,60));
-  assert.ok(d.querySelector('.g-hero'),'Sign up should unlock the personal RPG homepage');
+  assert.ok(d.querySelector('.g-hero'),'Sign up should unlock the personal RPG homepage. Error: '+(d.querySelector('#osh-auth-error')?.textContent||'none')+' | crypto: '+!!window.crypto?.subtle+' | warns: '+JSON.stringify(warnings.slice(-3)));
   const click = selector => {
     const el = d.querySelector(selector);
     assert.ok(el, 'Missing clickable element: '+selector+', page title: '+d.title+', text: '+d.body.textContent.slice(0,200));
