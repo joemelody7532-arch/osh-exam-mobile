@@ -130,7 +130,8 @@ def main() -> None:
         try:
             reply = session.get(url, timeout=25)
             reply.raise_for_status()
-            # These pages are UTF-8, but some hosts omit charset from HTTP headers.\n            soup = BeautifulSoup(reply.content.decode("utf-8", errors="replace"), "html.parser")
+            # These pages are UTF-8, but some hosts omit charset from HTTP headers.
+            soup = BeautifulSoup(reply.content.decode("utf-8", errors="replace"), "html.parser")
             print(f"{provider} HTML info: length={len(reply.text)}, tables={len(soup.find_all('table'))}, anchors={len(soup.find_all('a'))}, PDF links={sum(1 for a in soup.find_all('a', href=True) if '.pdf' in a['href'].lower())}, page_title={(soup.title.get_text(' ',strip=True)[:100] if soup.title else 'none')}")
             found = scan_oshbon(soup, url) if provider == "職安幫" else scan_soeasy(soup, url)
             successes += 1
