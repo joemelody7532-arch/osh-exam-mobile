@@ -16,6 +16,12 @@ const STAGES=[
  {name:"認識危害",icon:"📖",count:5},{name:"現場挑戰",icon:"🛡️",count:5},
  {name:"知識試煉",icon:"⚔️",count:5},{name:"BOSS 決戰",icon:"👾",count:8,boss:true}
 ];
+const EQUIPMENT=[
+ {id:"helmet",name:"勇者安全帽",icon:"⛑️",cost:80,desc:"戴上勇者頭盔，展示安全意識"},
+ {id:"eye",name:"風險觀察鏡",icon:"🔍",cost:120,desc:"收集風險辨識知識的紀念裝備"},
+ {id:"law",name:"法規之書",icon:"📕",cost:180,desc:"象徵法規知識逐步提升"},
+ {id:"kit",name:"緊急應變包",icon:"🎒",cost:220,desc:"珍惜每一項緊急應變技能"}
+];
 const $api=()=>window.oshGameAPI;
 const h=v=>String(v??"").replace(/[&<>"']/g,x=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[x]));
 function game(){const s=$api().saved();if(!s.adventure||typeof s.adventure!=="object")s.adventure={xp:0,coins:0,stars:{},zone:0,clears:0,bonuses:{}};const x=s.adventure;x.stars=x.stars||{};x.bonuses=x.bonuses||{};return x}
@@ -44,6 +50,7 @@ return '<main class="game-page">'+header()+
  '<button data-page="practice">📚 題庫修練場<small>題目詳解・錯題複習</small></button>'+
  '<button data-page="subjective">✍️ 甲級術科修練<small>申論與計算題</small></button>'+
  '<button data-page="settings">⚙️ 設定與備份<small>題庫更新、練習紀錄備份</small></button>'+
+ '<button data-game="bag">🎒 財財的背包<small>裝備商店・徽章收藏</small></button>'+
  '</div></section><div class="g-mini g-note">考古題連結依原網站的歷屆索引更新。遊戲星數、金幣與勇者等級只代表學習進度，不是官方檢定成績。</div></main>'}
 function map(){const g=game();const positions=[[30,12],[73,27],[30,41],[74,55],[28,70],[71,86]];
 let route='<svg class="route" viewBox="0 0 330 730" preserveAspectRatio="none"><path d="M99 88 Q300 135 238 200 Q32 267 99 300 Q294 367 244 402 Q42 478 92 510 Q290 575 235 620" fill="none" stroke="#654b29" stroke-width="12" stroke-dasharray="10 14" opacity=".45"/><path d="M99 88 Q300 135 238 200 Q32 267 99 300 Q294 367 244 402 Q42 478 92 510 Q290 575 235 620" fill="none" stroke="#fff2b5" stroke-width="5" stroke-dasharray="8 16" opacity=".8"/></svg>';
@@ -55,6 +62,23 @@ return '<main class="game-page">'+header()+navTitle('第 '+(z+1)+' 章　'+zone.
  '<div class="g-board" style="text-align:center;background:linear-gradient(#d2edf0,#eee1b2)"><div style="font-size:76px">'+zone.icon+'</div><h2>'+h(zone.name)+'</h2><p>'+h(zone.desc)+'</p><div class="g-progress"><span style="width:'+ct*25+'%"></span></div><small>已完成 '+ct+'/4 關</small></div>'+
  '<div class="g-stages">'+STAGES.map((s,i)=>{const open=canStage(z,i),st=stars(z,i);return '<button class="g-stage '+(open?'':'locked')+'" '+(open?'data-game="stage" data-z="'+z+'" data-s="'+i+'"':'disabled')+'><span class="g-stage-icon">'+(open?s.icon:'🔒')+'</span><span><strong>'+(z+1)+'-'+(i+1)+'　'+s.name+'</strong><small>'+s.count+' 題・'+(s.boss?'魔王決戰':'基礎挑戰')+'</small>'+starText(st)+'</span><span class="g-go">'+(open?(st?'再挑戰':'挑戰'):'未解鎖')+'</span></button>'}).join('')+'</div>'+
  '<p class="g-note" style="text-align:center">先完成前一關才能解鎖下一關；答錯後仍可查看解析。</p></main>'}
+function bag(){const g=game();g.items=g.items||{};const owned=EQUIPMENT.filter(e=>g.items[e.id]).length;
+const achievements=[
+ ["🎓","初級勇者",g.clears>=1,"通過第一個關卡"],
+ ["🐉","魔王剋星",ZONES.some((_,i)=>stars(i,3)>0),"挑戰成功任一 BOSS"],
+ ["⭐","星光收集者",totalStars()>=10,"累積 10 顆星"],
+ ["📚","勤學探險家",($api().saved().answers||[]).length>=30,"累積完成 30 題"],
+ ["🏅","進階職安勇者",level()>=5,"冒險角色達 Lv.5"]
+ ];
+return '<main class="game-page">'+header()+navTitle('🎒 財財的裝備背包','home')+
+ '<div class="g-board" style="text-align:center"><div style="font-size:56px">🐕</div><h2>Lv.'+level()+'　黑柴財財</h2><p>已蒐集 '+owned+'/4 件裝備 ・ '+totalStars()+' 顆星 ・ 🪙 '+g.coins+' 金幣</p><div class="g-progress"><span style="width:'+((g.xp%180)/180*100)+'%"></span></div><small>EXP '+(g.xp%180)+' / 180</small></div>'+
+ '<div class="g-title">🛒 冒險裝備商店 <span style="font-size:11px">金幣兌換</span></div>'+
+ '<div class="g-stages">'+EQUIPMENT.map(e=>'<div class="g-stage"><span class="g-stage-icon">'+e.icon+'</span><span style="flex:1"><strong>'+e.name+'</strong><small>'+e.desc+'</small></span><button class="g-btn '+(g.items[e.id]?'green':'')+'" style="min-height:33px;font-size:12px;padding:5px 8px" data-game="buy" data-item="'+e.id+'" '+(g.items[e.id]?'disabled':'')+'>'+(g.items[e.id]?'✓ 已收集':'🪙 '+e.cost)+'</button></div>').join('')+'</div>'+
+ '<div class="g-title" style="margin-top:20px">🏆 成就徽章</div><div class="g-board">'+achievements.map(a=>'<div class="g-row" style="padding:10px 0;border-bottom:1px solid #dec89d"><span style="font-size:26px;filter:'+(a[2]?'none':'grayscale(1)')+'">'+a[0]+'</span><div style="flex:1"><strong>'+a[1]+'</strong><div class="g-tiny">'+a[3]+'</div></div><span class="g-capsule" style="background:'+(a[2]?'#24885e':'#9a9486')+'">'+(a[2]?'已獲得':'尚未解鎖')+'</span></div>').join('')+'</div>'+
+ '<p class="g-note">背包是學習成就與收藏系統，不會改變題目正確答案、作答分數或正式考試結果。</p></main>'}
+function buyItem(id){const e=EQUIPMENT.find(x=>x.id===id);if(!e)return;const g=game();g.items=g.items||{};if(g.items[id])return;
+if(g.coins<e.cost){$api().toast('金幣不足！完成新的關卡可獲得更多金幣。');return}
+g.coins-=e.cost;g.items[id]=true;$api().persist();$api().refresh();$api().toast('恭喜財財獲得「'+e.name+'」！')}
 function getBattle(){const b=$api().saved().adventureBattle;return b && b.course===$api().course()?b:null}
 function chooseQuestions(z,stage){const pool=$api().allBank(),wanted=STAGES[stage].count,zone=ZONES[z];const matched=pool.filter(q=>zone.match.test((q.topic||"")+" "+(q.text||"")));const unique=new Map();
 const add=arr=>{for(const q of arr){if(!unique.has(q.id))unique.set(q.id,q);if(unique.size>=wanted)break}};
@@ -94,7 +118,7 @@ function victory(){const r=$api().saved().adventureResult;if(!r)return '<main cl
  '<button class="g-btn dark full" data-game="world">🗺️ 世界地圖</button></div></main>'}
 function dispatch(el){const type=el.dataset.game;const z=Number(el.dataset.z),s=Number(el.dataset.s);
 switch(type){
- case "home":$api().nav("home");break;case "world":$api().nav("adventure");break;
+ case "home":$api().nav("home");break;case "bag":$api().nav("bag");break;case "buy":buyItem(el.dataset.item);break;case "world":$api().nav("adventure");break;
  case "zone":if(!canZone(z))return;$api().saved().adventure.zone=z;$api().persist();$api().nav("chapter");break;
  case "stage":startStage(z,s);break;
  case "daily":{const g=game();let zi=ZONES.findIndex((_,i)=>canZone(i)&&stars(i,3)===0);if(zi<0)zi=5;let si=STAGES.findIndex((_,i)=>canStage(zi,i)&&stars(zi,i)===0);if(si<0)si=0;startStage(zi,si);break}
@@ -104,6 +128,6 @@ switch(type){
  case "resume":$api().nav("battle");break;
 }}
 document.addEventListener("click",event=>{const el=event.target.closest("[data-game]");if(!el||el.disabled)return;event.preventDefault();dispatch(el)});
-window.oshAdventure={home,map,chapter,battle,victory};
+window.oshAdventure={home,map,chapter,battle,victory,bag};
 if(window.oshGameAPI)window.oshGameAPI.refresh();
 })();
