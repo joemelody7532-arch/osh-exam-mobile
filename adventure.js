@@ -26,7 +26,7 @@ function canZone(z){return z===0||stars(z-1,3)>0}
 function canStage(z,s){return canZone(z)&&(s===0||stars(z,s-1)>0)}
 function starText(n){return '<span class="g-stars">'+'★'.repeat(n)+'<span class="dim">'+'☆'.repeat(3-n)+'</span></span>'}
 function totalStars(){return Object.values(game().stars).reduce((n,v)=>n+Number(v||0),0)}
-function mascot(){return '<img class="g-photo" src="./shiba-photo.svg?v=2" alt="黑柴財財安全勇者">'}
+function mascot(){return '<img class="g-photo" src="./shiba-photo.svg" loading="lazy" alt="財財：戴黃色安全帽的黑柴勇者">'}
 function mascotImg(){return '<span aria-label="黑柴財財" class="g-shiba-mark">'+mascot()+'</span>'}
 function header(){const g=game(), exp=g.xp%180,pc=Math.round(exp/180*100);return '<div class="g-status"><span class="g-avatar">'+mascot()+'</span><div class="g-status-text"><strong>🐾 財財勇者　Lv.'+level()+'</strong><small>甲級闖關學習系統　'+($api().course()==="22100"?"職業衛生":$api().course()==="22000"?"職業安全":"職安衛")+'</small><div class="g-exp"><i style="width:'+pc+'%"></i></div></div><div class="g-coins">🪙 <b>'+g.coins+'</b><small>金幣</small></div><div class="g-coins">⭐ <b>'+totalStars()+'</b><small>星星</small></div></div>'}
 function navTitle(title,back,description){return '<div class="g-title"><button data-game="'+back+'">← 返回</button><span>'+h(title)+'</span><span style="font-size:11px">🐾</span></div>'+(description?'<p class="g-note pale">'+h(description)+'</p>':'')}
@@ -85,7 +85,7 @@ const s=$api().saved(),g=game(),old=stars(b.zone,b.stage);let gold=0,xp=0;
 if(pass&&earned>old){gold=25+(earned-old)*15;xp=40+(earned-old)*35;g.stars[stageKey(b.zone,b.stage)]=earned;g.xp+=xp;g.coins+=gold;if(old===0)g.clears++}
 s.adventureResult={course:b.course,z:b.zone,stage:b.stage,score:b.correct,total:b.ids.length,pass,earned,gold,xp,hp:b.hp};s.adventureBattle=null;$api().persist();$api().nav("victory")}
 function victory(){const r=$api().saved().adventureResult;if(!r)return '<main class="game-page">'+header()+'<button class="g-btn full" data-game="world">世界地圖</button></main>';return '<main class="game-page">'+header()+
- '<div class="g-win"><div class="big-shiba">'+(r.pass?'🐕':'🐾')+'</div><h2>'+(r.pass?'關關成功！':'這次還沒過關')+'</h2><p style="font-weight:900;color:#5b381b">'+(r.z+1)+'-'+(r.stage+1)+'　'+STAGES[r.stage].name+'</p>'+
+ '<div class="g-win"><div class="big-shiba"><img src="./shiba-photo.svg" alt="黑柴勇者財財" loading="lazy"></div><h2>'+(r.pass?'關關成功！':'這次還沒過關')+'</h2><p style="font-weight:900;color:#5b381b">'+(r.z+1)+'-'+(r.stage+1)+'　'+STAGES[r.stage].name+'</p>'+
  '<div style="font-size:33px;color:#fff6c8;text-shadow:1px 2px #794e27">'+(r.pass?'⭐'.repeat(r.earned):'☆ ☆ ☆')+'</div><p>答對 '+r.score+' / '+r.total+' 題　'+Math.round(r.score/r.total*100)+'%</p>'+
  '<div class="g-reward"><div><span>✨</span>經驗值 +'+r.xp+'</div><div><span>🪙</span>金幣 +'+r.gold+'</div><div><span>❤️</span>剩餘 '+r.hp+'</div></div>'+
  '<p class="g-note">'+(r.pass?'完成學習試煉！通過 BOSS 後即可開啟下一章。':'勇者先複習錯題，再挑戰一次就能更熟悉危害與法規。')+'</p>'+
