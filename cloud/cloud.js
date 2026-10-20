@@ -131,11 +131,12 @@ async function authSubmit(e){
  e.preventDefault();if(authBusy||connecting||!client)return;
  const mail=$('cloud-email')?.value.trim().toLowerCase()||'';
  const pass=$('cloud-pass')?.value||'';
+ const confirmPassword=$('cloud-pass-confirm')?.value||'';
  const name=$('cloud-name')?.value.trim()||'職安勇者';
  authBusy=true;promptMessage='正在驗證…';const m=mode;renderAuth();
  try{
   if(m==='newpass'){
-   if(pass!==$('cloud-pass-confirm')?.value)throw Error('兩次輸入的密碼不一致');
+   if(pass!==confirmPassword)throw Error('兩次輸入的密碼不一致');
    const {error}=await client.auth.updateUser({password:pass});if(error)throw error;
    mode='login';promptMessage='新密碼已設定完成。請使用新密碼登入。';
    await client.auth.signOut();
