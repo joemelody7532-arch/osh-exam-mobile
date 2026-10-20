@@ -58,7 +58,7 @@ function view(){
   '<input id="osh-new-name" name="nickname" maxlength="20" minlength="1" required placeholder="例：財財、Joe、同事A">'+
   '<label for="osh-new-pin">自訂 6～12 位數 PIN 碼</label><input id="osh-new-pin" type="password" inputmode="numeric" pattern="[0-9]{6,12}" autocomplete="new-password" required minlength="6" maxlength="12" placeholder="僅供本機切換檔案使用">'+
   '<label for="osh-new-confirm">再輸入一次 PIN</label><input id="osh-new-confirm" type="password" inputmode="numeric" pattern="[0-9]{6,12}" autocomplete="new-password" required minlength="6" maxlength="12" placeholder="確認 PIN">'+
-  (recovery?'<label class="osh-checkbox"><input id="osh-claim-legacy" type="checkbox" checked>將本瀏覽器原有的答題與闖關紀錄歸入此檔案（僅可執行一次）</label>':'')+
+  (recovery?'<label class="osh-checkbox"><input id="osh-claim-legacy" type="checkbox">匯入舊版共用進度（可選，僅一次）。⚠️ 如果以前多人共用此手機，舊成績可能混雜，建議不要勾選。</label>':'')+
   '<button class="osh-submit" type="submit">🐕 建立並開始冒險</button></form>':
   '<form id="osh-signin" autocomplete="off"><label for="osh-account-select">選擇個人檔案</label>'+
   '<select id="osh-account-select" required>'+optionTags+'</select>'+
