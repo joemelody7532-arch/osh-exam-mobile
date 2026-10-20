@@ -1,0 +1,32 @@
+/* 職安勇者・本機個人檔案登入 v5 */
+.osh-account-page{min-height:100dvh;padding:30px 20px 48px;background:
+radial-gradient(circle at 84% 12%,#fef4bc9e 0,transparent 27%),
+linear-gradient(170deg,#1b536c 0,#459b9a 31%,#b8d39a 65%,#efe5c2 100%);font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC",sans-serif;color:#3e2b1f}
+.osh-auth-mark{text-align:center;font-size:61px;filter:drop-shadow(0 5px 6px #203b3288)}
+.osh-auth-title{font-size:29px;text-align:center;color:#ffe2a1;font-weight:950;letter-spacing:4px;text-shadow:1px 4px #62401f,0 5px 14px #1f463a}
+.osh-auth-sub{text-align:center;color:#fff6d7;font-weight:850;font-size:13px;margin:4px 0 22px}
+.osh-auth-card{border:4px solid #b6874e;box-shadow:inset 0 0 0 2px #fff7da,0 7px 0 #76522e,0 16px 24px #0e3d4750;background:linear-gradient(145deg,#fffbee,#f4e0b8);border-radius:23px;padding:18px 16px 21px}
+.osh-auth-tabs{display:flex;border-radius:13px;overflow:hidden;background:#e8d3ad;margin-bottom:20px;gap:4px;padding:4px}
+.osh-auth-tabs button{flex:1;border:0;padding:10px 3px;border-radius:10px;background:transparent;color:#78573b;font-weight:850;font-size:12px}
+.osh-auth-tabs button.active{background:#fff8e7;box-shadow:0 2px 5px #8d683a3b;color:#7a431e}
+.osh-auth-tabs button:disabled{opacity:.5}
+.osh-auth-card form{display:grid;gap:9px}
+.osh-auth-card form>label:not(.osh-checkbox){color:#654428;font-size:13px;font-weight:900;margin-top:7px}
+.osh-auth-card input:not([type=checkbox]),.osh-auth-card select{width:100%;height:48px;border:2px solid #d0af7d;border-radius:11px;background:#fffdfa;padding:9px 12px;color:#3a302a;font-size:16px;outline:none;box-sizing:border-box}
+.osh-auth-card input:focus,.osh-auth-card select:focus{border-color:#348f79;box-shadow:0 0 0 3px #5bbba640}
+.osh-checkbox{font-size:12px;line-height:1.6;color:#4a3c2c;display:flex;align-items:flex-start;gap:9px;background:#f8edcd;border-radius:10px;border:1px solid #d6bc8f;padding:11px;margin:10px 0 5px}
+.osh-checkbox input{accent-color:#3c9773;margin-top:4px;flex-shrink:0}
+.osh-submit{margin-top:13px;min-height:50px;border-radius:13px;background:linear-gradient(#ffe58e,#efb345);border:3px solid #986334;color:#4b2b15;font-size:15px;font-weight:950;box-shadow:0 4px 0 #855125}
+.osh-submit:disabled{opacity:.6}
+.osh-error{background:#fff0e7;border:1px solid #d87e6a;color:#9d2e21;padding:11px;border-radius:10px;font-size:13px;line-height:1.6}
+.osh-auth-tip{background:#fff8e5e8;padding:15px;margin-top:20px;border:2px solid #d5b588;border-radius:16px;font-size:12px;line-height:1.8;color:#604c39}
+.osh-auth-tip strong{color:#51361e}
+.osh-auth-tip p{margin:6px 0 10px}
+.osh-userchip{background:#fff2d8;border:1px solid #d5b17c;color:#51361f;border-radius:18px;padding:6px 10px;font-weight:900;font-size:11px;max-width:122px;text-overflow:ellipsis;white-space:nowrap;overflow:hidden;cursor:pointer}
+.topbar .osh-header-right{display:flex;align-items:center;gap:7px}
+.osh-settings-account{background:linear-gradient(145deg,#f9efd0,#fff9e8);border:2px solid #cfaa6e;border-radius:15px;padding:14px;margin:12px 0}
+.osh-settings-account strong{display:block;color:#584027;font-size:14px}
+.osh-settings-account p{font-size:11px;color:#775d43;line-height:1.7;margin:5px 0 12px}
+.osh-signout{border:2px solid #b48851;border-radius:11px;padding:9px 16px;background:#fff8e6;color:#7d4329;font-weight:850}
+.g-status .osh-userchip{margin-left:4px;max-width:78px;padding:5px 6px;background:#fff8df}
+@media(max-width:395px){.topbar .small-date{display:none}.osh-userchip{max-width:103px}.osh-account-page{padding:24px 14px}}
