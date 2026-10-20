@@ -21,6 +21,7 @@ LAWS = {
     "N0060022": ("2026-06-26", "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=N0060022"),
     "N0060027": ("2026-06-29", "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=N0060027"),
     "N0060001": ("2025-12-19", "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=N0060001"),
+    "N0060009": ("2026-06-30", "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=N0060009"),
     "N0060040": ("2022-08-12", "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=N0060040"),
 }
 
