@@ -329,7 +329,28 @@ async function importJSON(file){try{const data=JSON.parse(await file.text());if(
 function attach(){document.querySelectorAll('[data-page]').forEach(el=>el.addEventListener('click',()=>{page=el.dataset.page;render()}));document.getElementById('resume')?.addEventListener('click',()=>{page='quiz';render()});document.getElementById('course')?.addEventListener('change',e=>{certificate=e.target.value;official=cachedPublicBank(certificate);inSession=null;persist();render();refreshLiveBank(certificate,true)});document.querySelectorAll('[data-target]').forEach(el=>el.addEventListener('click',()=>{target=+el.dataset.target;persist();render()}));document.querySelectorAll('[data-start]').forEach(el=>el.addEventListener('click',()=>start(el.dataset.start)));document.querySelectorAll('[data-focus]').forEach(el=>el.addEventListener('click',()=>start('focus',el.dataset.focus)));document.querySelectorAll('[data-topic]').forEach(el=>el.addEventListener('click',()=>start('topic',el.dataset.topic)));document.getElementById('bankFilter')?.addEventListener('change',e=>{bankFilter=e.target.value;render()});document.getElementById('archiveYear')?.addEventListener('change',e=>{archiveYear=+e.target.value;render()});document.querySelectorAll('[data-opt]').forEach(el=>el.addEventListener('click',()=>chooseOption(+el.dataset.opt)));document.querySelector('[data-check]')?.addEventListener('click',checkAnswer);document.querySelector('[data-next]')?.addEventListener('click',nextQuestion);document.querySelector('[data-prev]')?.addEventListener('click',()=>{inSession.idx=Math.max(0,inSession.idx-1);persist();render()});document.querySelector('[data-finish]')?.addEventListener('click',()=>{if(confirm('確定交卷？未作答的題目計為 0 分。'))finish()});document.querySelector('[data-exit]')?.addEventListener('click',()=>{if(inSession?.mock&&!confirm('離開後可繼續，但計時不會暫停。確定離開？'))return;page='home';persist();render()});document.getElementById('bookmark')?.addEventListener('click',()=>{const id=current().id;saved.favorites=saved.favorites.includes(id)?saved.favorites.filter(v=>v!==id):[...saved.favorites,id];persist();renderPreserve()});document.getElementById('sync')?.addEventListener('click',updateCloud);document.getElementById('export')?.addEventListener('click',exportJSON);document.getElementById('importFile')?.addEventListener('change',e=>{if(e.target.files[0])importJSON(e.target.files[0])});document.getElementById('clear')?.addEventListener('click',()=>{if(!confirm('確定清空練習紀錄與錯題？此操作無法復原。'))return;saved.answers=[];saved.records=[];saved.attempts={};saved.favorites=[];inSession=null;persist();render();toast('已清除練習紀錄')});document.getElementById('saveDraft')?.addEventListener('click',()=>{const qs=BUNDLED_PRACTICE.subjective.filter(q=>q.specialty===(certificate==='22100'?'health':'safe')),q=qs[Number(saved.subjIdx||0)%qs.length];saved.subjectDrafts=saved.subjectDrafts||{};saved.subjectDrafts[q.id]=document.getElementById('subjectAnswer').value;persist();toast('已儲存術科作答草稿')});for(const [id,delta] of [['subjPrev',-1],['subjNext',1]])document.getElementById(id)?.addEventListener('click',()=>{const qs=BUNDLED_PRACTICE.subjective.filter(q=>q.specialty===(certificate==='22100'?'health':'safe'));const idx=Number(saved.subjIdx||0)%qs.length;saved.subjectDrafts=saved.subjectDrafts||{};saved.subjectDrafts[qs[idx].id]=document.getElementById('subjectAnswer').value;saved.subjIdx=(idx+delta+qs.length)%qs.length;persist();render()})}
 if(saved.session&&saved.session.ids?.length){inSession=saved.session;if(inSession.deadline&&inSession.deadline<Date.now()){examResult=null;const backup=inSession;inSession=backup;finish()}else{page='home';}}
 render();
+
+async function loadArchiveFeed(){
+ // Merge newly indexed public historical exam PDF links without altering saved quiz progress.
+ try{
+  const response=await fetch('./data/archive-index.json?day='+Math.floor(Date.now()/86400000),{cache:'no-store'});
+  if(!response.ok)return;
+  const data=await response.json();
+  if(!data||!Array.isArray(data.entries))return;
+  const existing=new Set(archives.map(entry=>entry.url));
+  let added=0;
+  for(const item of data.entries){
+   if(!item||!Number.isInteger(item.year)||item.year<2010||!['22000','22100','22200'].includes(item.certificate))continue;
+   if(typeof item.url!=='string'||!/^https:\/\//i.test(item.url)||existing.has(item.url))continue;
+   archives.push({year:item.year,roc_year:item.roc_year||item.year-1911,certificate:item.certificate,session:item.session||null,category:String(item.category||'公開連結').slice(0,30),title:String(item.title||'歷屆公開試題').slice(0,100),publisher:String(item.publisher||'公開來源').slice(0,100),url:item.url,source_type:'public_reference_link'});
+   existing.add(item.url);added++;
+  }
+  if(added && !inSession && ['home','archive','settings'].includes(page))render();
+ }catch(_error){/* Keep original bundled archive links if unavailable. */}
+}
+
 updateCloud(true);
+loadArchiveFeed();
 loadLawReport();
 loadDetailedReasons();
 // Single-file edition: no service worker asset needed.
