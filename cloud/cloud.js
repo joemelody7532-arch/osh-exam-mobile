@@ -9,7 +9,7 @@ if(!/^https:\/\/[a-z0-9-]+\.supabase\.co\/?$/.test(cfg.url||'')||
 const KEY_PREFIX='OSH_Exam_PWA_v1_cloud_';
 const BASE_PREFIX='OSH_Cloud_Baseline_v1_';
 let client=null,user=null,profile=null,ready=false,connecting=true;
-let base={},version=0,rowExists=false,debounce=null,sending=false,pending=false,lastNotice='',isRefreshing=false;
+let base={},version=0,rowExists=false,debounce=null,sending=false,pending=false,lastNotice='',isRefreshing=false,adoptingId=null;
 let mode='login',promptMessage='',authBusy=false;
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[x]));
@@ -68,9 +68,9 @@ function mergeState(local,remote,baseline){
  result.attempts=tally;
  const r=remote.adventure||{},l=local.adventure||{},b=baseline?.adventure||{};
  const award=field=>Math.max(0,Number(r[field]||0)+(Number(l[field]||0)-Number(b[field]||0)));
- result.adventure={...r,...l,
-  xp:award('xp'),coins:award('coins'),clears:award('clears'),
-  stars:{...r.stars}};
+ result.adventure={...r};
+ for(const [key,value] of Object.entries(l))if(!['xp','coins','clears','stars','items'].includes(key)&&!equal(value,b[key]))result.adventure[key]=clone(value);
+ result.adventure.xp=award('xp');result.adventure.coins=award('coins');result.adventure.clears=award('clears');result.adventure.stars={...r.stars};
  for(const [stage,stars] of Object.entries(l.stars||{}))result.adventure.stars[stage]=Math.max(Number(result.adventure.stars[stage]||0),Number(stars||0));
  result.adventure.items={...r.items,...l.items};
  return result;
@@ -107,10 +107,11 @@ function renderAuth(){
  (status?'<p class="osh-auth-message" role="status">'+esc(status)+'</p>':'')+
  '<form id="cloud-auth-form" autocomplete="on">'+
  (mode==='signup'?'<label for="cloud-name">暱稱</label><input id="cloud-name" maxlength="40" required placeholder="例如：職安勇者小明">':'')+
- '<label for="cloud-email">電子郵件</label><input id="cloud-email" type="email" autocomplete="username" required placeholder="name@example.com">'+
- (mode==='reset'?'':'<label for="cloud-pass">帳號密碼（至少 8 個字元）</label><input id="cloud-pass" type="password" autocomplete="'+(mode==='signup'?'new-password':'current-password')+'" minlength="8" required>')+
+ (mode==='newpass'?'':'<label for="cloud-email">電子郵件</label><input id="cloud-email" type="email" autocomplete="username" required placeholder="name@example.com">')+
+ (mode==='reset'?'':'<label for="cloud-pass">'+(mode==='newpass'?'設定新密碼':'帳號密碼（至少 8 個字元）')+'</label><input id="cloud-pass" type="password" autocomplete="'+(mode==='signup'||mode==='newpass'?'new-password':'current-password')+'" minlength="8" required>')+
+ (mode==='newpass'?'<label for="cloud-pass-confirm">再次輸入新密碼</label><input id="cloud-pass-confirm" type="password" minlength="8" required>':'')+
  '<button class="osh-submit" type="submit" '+(authBusy||connecting?'disabled':'')+'>'+
- (connecting?'連線中…':mode==='signup'?'建立雲端帳號':mode==='reset'?'寄送密碼重設信':'登入我的學習紀錄')+
+ (connecting?'連線中…':mode==='signup'?'建立雲端帳號':mode==='reset'?'寄送密碼重設信':mode==='newpass'?'儲存新密碼':'登入我的學習紀錄')+
  '</button></form></div><div class="osh-auth-tip"><strong>跨手機同步已準備好</strong>'+
  '<p>雲端帳號以 Email＋密碼登入；資料庫會依帳號隔離作答及闖關進度。</p>'+
  '<p>管理員可以查看學習成果，其他學員無法讀取你的個人成績。</p>'+
@@ -128,12 +129,17 @@ async function submitAuth(e){
 // Overrides submitAuth with direct capture before painting.
 async function authSubmit(e){
  e.preventDefault();if(authBusy||connecting||!client)return;
- const mail=$('cloud-email').value.trim().toLowerCase();
+ const mail=$('cloud-email')?.value.trim().toLowerCase()||'';
  const pass=$('cloud-pass')?.value||'';
  const name=$('cloud-name')?.value.trim()||'職安勇者';
  authBusy=true;promptMessage='正在驗證…';const m=mode;renderAuth();
  try{
-  if(m==='signup'){
+  if(m==='newpass'){
+   if(pass!==$('cloud-pass-confirm')?.value)throw Error('兩次輸入的密碼不一致');
+   const {error}=await client.auth.updateUser({password:pass});if(error)throw error;
+   mode='login';promptMessage='新密碼已設定完成。請使用新密碼登入。';
+   await client.auth.signOut();
+  }else if(m==='signup'){
    const {data,error}=await client.auth.signUp({email:mail,password:pass,options:{data:{display_name:name},emailRedirectTo:cfg.redirectUrl||location.origin+location.pathname}});
    if(error)throw error;
    if(data.session)await adopt(data.session.user);
@@ -159,7 +165,8 @@ renderAuth=function(){
 };
 
 async function adopt(next){
- if(!next?.id)return;
+ if(!next?.id||adoptingId===next.id)return;
+ adoptingId=next.id;
  connecting=true;promptMessage='正在讀取雲端學習進度…';renderAuth();
  try{
   const info=await client.from('learner_profiles').select('display_name,role').eq('user_id',next.id).single();
@@ -177,6 +184,7 @@ async function adopt(next){
   touch();
   if(locallyModified)scheduleSync();
  }catch(err){connecting=false;ready=false;user=null;promptMessage='無法讀取雲端進度，請檢查資料庫或網路：'+String(err?.message||err).slice(0,200);renderAuth()}
+ finally{adoptingId=null}
 }
 function scheduleSync(){
  if(!ready||!user)return;
@@ -275,7 +283,8 @@ async function init(){
   else {promptMessage='請登入你的雲端學員帳號。';renderAuth()}
   client.auth.onAuthStateChange((event,session)=>{
    if(event==='SIGNED_OUT'&&ready){ready=false;user=null;profile=null;touch();}
-   else if(event==='SIGNED_IN'&&session?.user&&session.user.id!==user?.id){
+   else if(event==='PASSWORD_RECOVERY'){mode='newpass';promptMessage='請輸入新密碼完成重設。';ready=false;user=null;renderAuth()}
+   else if(event==='SIGNED_IN'&&mode!=='newpass'&&session?.user&&session.user.id!==user?.id){
     setTimeout(()=>adopt(session.user),0);
    }
   });
