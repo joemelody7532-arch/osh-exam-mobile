@@ -2,6 +2,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const { JSDOM, ResourceLoader, VirtualConsole } = require('jsdom');
+const { webcrypto } = require('node:crypto');
 
 const root = path.resolve(__dirname, '..');
 const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
@@ -31,6 +32,7 @@ async function main() {
       window.fetch = async () => ({ok:false,status:404,json:async()=>({})});
       window.scrollTo = () => {};
       window.confirm = () => true;
+      Object.defineProperty(window.crypto,'subtle',{value:webcrypto.subtle,configurable:true});
     }
   });
   const { window } = dom;
@@ -40,6 +42,13 @@ async function main() {
   ]);
   await new Promise(resolve=>setTimeout(resolve,25));
   const d = window.document;
+  assert.ok(d.querySelector('#osh-signup'),'New visitors should see the sign-up form first');
+  d.querySelector('#osh-new-name').value='測試職安勇者';
+  d.querySelector('#osh-new-pin').value='123456';
+  d.querySelector('#osh-new-confirm').value='123456';
+  d.querySelector('#osh-signup').dispatchEvent(new window.Event('submit',{bubbles:true,cancelable:true}));
+  for(let i=0;i<90&&!d.querySelector('.g-hero');i++)await new Promise(resolve=>setTimeout(resolve,60));
+  assert.ok(d.querySelector('.g-hero'),'Sign up should unlock the personal RPG homepage');
   const click = selector => {
     const el = d.querySelector(selector);
     assert.ok(el, 'Missing clickable element: '+selector+', page title: '+d.title+', text: '+d.body.textContent.slice(0,200));
