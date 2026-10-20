@@ -32,6 +32,7 @@ async function main() {
       window.fetch = async () => ({ok:false,status:404,json:async()=>({})});
       window.scrollTo = () => {};
       window.confirm = () => true;
+      window.TextEncoder=require('node:util').TextEncoder;
       Object.defineProperty(window.crypto,'subtle',{value:webcrypto.subtle,configurable:true});
     }
   });
