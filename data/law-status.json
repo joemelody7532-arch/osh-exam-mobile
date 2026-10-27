@@ -1,7 +1,7 @@
 {
-  "checked_at": "",
+  "checked_at": "2026-10-27 15:47 (台灣)",
   "checked_scope": "僅比對官方頁面的「修正日期」，不判定條文施行日或題目答案是否過時；需人工複核。",
-  "successful_sources": 0,
+  "successful_sources": 5,
   "laws": {
     "N0060022": {
       "amended": "2026-06-26",
@@ -25,26 +25,5 @@
     }
   },
   "changes": [],
-  "errors": [
-    {
-      "code": "N0060022",
-      "message": "<urlopen error [Errno 101] Network is unreachable>"
-    },
-    {
-      "code": "N0060027",
-      "message": "<urlopen error [Errno 101] Network is unreachable>"
-    },
-    {
-      "code": "N0060001",
-      "message": "<urlopen error [Errno 101] Network is unreachable>"
-    },
-    {
-      "code": "N0060009",
-      "message": "<urlopen error [Errno 101] Network is unreachable>"
-    },
-    {
-      "code": "N0060040",
-      "message": "<urlopen error [Errno 101] Network is unreachable>"
-    }
-  ]
+  "errors": []
 }
