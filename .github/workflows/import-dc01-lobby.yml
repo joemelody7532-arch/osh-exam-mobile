@@ -1,0 +1,30 @@
+name: Import DC01 Lobby video
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/import-dc01-lobby.yml']
+permissions:
+  contents: write
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Fetch original user-supplied Lobby video
+        env:
+          SOURCE: 'https://d2jqrm6oza8nb6.cloudfront.net/datasets/9152013e-18dc-4ae7-b68a-9cccaf7bc054.MOV?_jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXlIYXNoIjoiMGE2N2JjZWFiZmQ4ZjdlMCIsImJ1Y2tldCI6InJ1bndheS1kYXRhc2V0cyIsInN0YWdlIjoicHJvZCIsImV4cCI6MTc5Mzk2NTkzMH0.QLNdEE3ANoWBKSS0TRUpeUMuB50UxU8cPlnc94BvswA'
+        run: |
+          set -euo pipefail
+          mkdir -p hss-safety-map/quest/lobby/media
+          curl --fail --location --retry 3 "$SOURCE" -o /tmp/DC01_Lobby.MOV
+          ffmpeg -hide_banner -loglevel error -y -i /tmp/DC01_Lobby.MOV -map 0:v:0 -map 0:a:0? -c copy -movflags +faststart hss-safety-map/quest/lobby/media/DC01_Lobby.mp4
+          test -s hss-safety-map/quest/lobby/media/DC01_Lobby.mp4
+      - name: Publish mp4 into Pages site
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add hss-safety-map/quest/lobby/media/DC01_Lobby.mp4
+          git commit -m "Publish DC01 Lobby walkthrough video"
+          git push
