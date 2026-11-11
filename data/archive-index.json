@@ -1,6 +1,6 @@
 {
-  "checked_at": "2026-11-10T09:53:00+00:00",
-  "sources_checked": 1,
+  "checked_at": "2026-11-11T09:28:08+00:00",
+  "sources_checked": 2,
   "new_links": 0,
   "entries": [
     {
@@ -1258,8 +1258,6 @@
       "source_type": "public_reference_link"
     }
   ],
-  "scan_errors": [
-    "職安幫: HTTPError: 403 Client Error: Site Disabled for url: https://www.oshbon.com.tw/license/OshSkillTest/QuestionBank"
-  ],
+  "scan_errors": [],
   "note": "Link index only; historical PDF files are not automatically converted into interactive questions."
 }
